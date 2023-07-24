@@ -18,27 +18,30 @@ import {
   useColorModeValue,
   useDisclosure,
   Input,
-  Textarea
+  Textarea,
+  Center,
+  Avatar,
+  Text
 } from '@chakra-ui/react';
 import { MoonIcon, SunIcon, AddIcon } from '@chakra-ui/icons';
 import { BsSun, BsMoonStarsFill } from 'react-icons/bs';
 import { useNavigate } from "react-router-dom"
 import { addCarFn } from '../pages/api';
-
+import { message, Badge } from "antd"
 
 
 const NavBar = () => {
   const [data, setData] = useState({
-    Brand: "",
-    Model_name: "",
-    Model_year:null,
-    Color: "",
-    Odometer_Km: null,
-    Major_Accident: null,
-    PR_Owners: null,
-    Place: "",
-    Image: "",
-    Description: ""
+    brand: "",
+    model_name: "",
+    model_year:null,
+    color: "",
+    odometer_km: null,
+    major_accidents: null,
+    previous_owners: null,
+    registration_place: "",
+    image: "",
+    description: ""
   })
   const { isOpen, onOpen, onClose } = useDisclosure()
   const { colorMode, toggleColorMode } = useColorMode();
@@ -55,10 +58,27 @@ const NavBar = () => {
 
   const handleAdd = () => {
     addCarFn(data)
+    .then((res)=> {
+      console.log(res,"33")
+      if(res.status==201){
+        message.success("car added successfully")
+        onClose()
+        // navigate("/")
+        
+      }else{
+        message.error("car not added somthing wrong try again")
+      }
+      
+  })
     // console.log(data)
-    setData("")
+    
   }
 
+   const handleLogout = () => {
+    message.success("logout Successfully")
+    sessionStorage.clear()
+    navigate("/login")
+}
 
 
   return (
@@ -79,7 +99,7 @@ const NavBar = () => {
             icon={<AddIcon />}
             size="sm"
             variant="outline"
-
+            onClick={onOpen}
           />
           <Box fontWeight="bold" cursor={"pointer"} onClick={onOpen}>ADD CAR</Box>
           {/* Modal code is start */}
@@ -88,30 +108,33 @@ const NavBar = () => {
             <ModalContent>
               <ModalHeader>Add Car</ModalHeader>
               <ModalCloseButton />
-              <ModalBody spacing={3} maxWidth={"500px"} height={"300px"}>
+              <ModalBody spacing={3} maxWidth={"500px"} height={"300px"} >
                 {/* <Lorem count={2} /> */}
 
 
-                <Input name='Brand' value={data.Brand} type="text" placeholder='Enter Brand' mb={4} onChange={handleChange} />
-                <Input name='Model_name' value={data.Model_name} type="text" placeholder='Enter Model Name' mb={4} onChange={handleChange} />
-                <Input name='Model_year' value={data.Model_year} type="number" placeholder='Enter Model Year' mb={4} onChange={handleChange} />
-                <Input name='Color' value={data.Color} type="text" placeholder='Enter Color' mb={4} onChange={handleChange} />
-                <Input name='Odometer_Km' value={data.Odometer_Km} type="number" placeholder='Enter Odometer KM' mb={4} onChange={handleChange} />
-                <Input name='Major_Accident' value={data.Major_Accident} type="number" placeholder='Enter Number of Major Accidents' mb={4} onChange={handleChange} />
-                <Input name='PR_Owners' value={data.PR_Owners} type="number" placeholder='Enter Number of Previous Owners' mb={4} onChange={handleChange} />
-                <Input name='Place' value={data.Place} type="text" placeholder='Enter Registration Place' mb={4} onChange={handleChange} />
-                <Input name='Image' value={data.Image} type="text" placeholder='Enter Image URL' mb={4} onChange={handleChange} />
+                <Input name='brand' value={data.brand} type="text" placeholder='Enter Brand' mb={4} onChange={handleChange} required/>
+                <Input name='model_name' value={data.model_name} type="text" placeholder='Enter Model Name' mb={4} onChange={handleChange} />
+                <Input name='model_year' value={data.model_year} type="number" placeholder='Enter Model Year' mb={4} onChange={handleChange} />
+                <Input name='color' value={data.color} type="text" placeholder='Enter Color' mb={4} onChange={handleChange} />
+                <Input name='odometer_km' value={data.odometer_km} type="number" placeholder='Enter Odometer KM' mb={4} onChange={handleChange} />
+                <Input name='major_accidents' value={data.major_accidents} type="number" placeholder='Enter Number of Major Accidents' mb={4} onChange={handleChange} />
+                <Input name='previous_owners' value={data.previous_owners} type="number" placeholder='Enter Number of Previous Owners' mb={4} onChange={handleChange} />
+                <Input name='registration_place' value={data.registration_place} type="text" placeholder='Enter Registration Place' mb={4} onChange={handleChange} />
+                <Input name='image' value={data.image} type="text" placeholder='Enter Image URL' mb={4} onChange={handleChange} />
                 <Box>
-                  <Textarea name="Description" placeholder='Enter Description' mb={4} onChange={handleChange} />
+                  <Textarea name="description" placeholder='Enter Description' mb={4} onChange={handleChange} />
                 </Box>
 
 
               </ModalBody>
 
               <ModalFooter>
-                <Button colorScheme='blue' mr={3} onClick={handleAdd}>
+                <Box width={"100%"} textAlign={"center"}>
+
+                <Button padding={"10px 50px"}  colorScheme='blue' mr={3} onClick={handleAdd} justifyContent={"center"} textAlign={"center"}> 
                   ADD
                 </Button>
+                </Box>
                 {/* <Button variant='ghost'>Secondary Action</Button> */}
               </ModalFooter>
             </ModalContent>
@@ -121,7 +144,7 @@ const NavBar = () => {
 
 
 
-          <Box fontWeight="bold" cursor={"pointer"}>CAR FOR SALE</Box>
+          <Box fontWeight="bold" cursor={"pointer"} onClick={()=>navigate("/")}>CAR FOR SALE</Box>
           <IconButton
             aria-label="Toggle Dark Mode"
             icon={colorMode === 'dark' ? <BsSun /> : <BsMoonStarsFill />}
@@ -129,12 +152,20 @@ const NavBar = () => {
             onClick={toggleColorMode}
             variant="outline"
           />
+           <Center>
+            <Text>{sessionStorage.getItem("email")}</Text>
+                    <Avatar
+                    ml={2}
+                      size={'sm'}
+                      src={'https://avatars.dicebear.com/api/male/username.svg'}
+                    />
+                  </Center>
 
           <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
             Login
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => navigate("/register")}>
-            Register
+          <Button variant="ghost" size="sm" onClick={handleLogout}>
+            Logout
           </Button>
         </HStack>
       </Flex>

@@ -19,6 +19,7 @@ import {
   import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { userRegisterFun } from './api';
 import { useNavigate } from 'react-router-dom';
+import { message } from 'antd';
   
   export default function SignupCard() {
     const [showPassword, setShowPassword] = useState(false);
@@ -31,12 +32,22 @@ import { useNavigate } from 'react-router-dom';
 const handleRegister = () => {
   let data = {name,email,password,role}
   // console.log(data);
-  userRegisterFun(data)
-
+userRegisterFun(data)
+.then((res)=> {
+ if(res.status==201){
+  message.success("User register successfully")
   setName("")
   setEmail("")
   setPassword("")
   setRole("")
+  navigate("/login")
+ }else{
+  message.error("something went wrong in server try again")
+ }
+})
+
+
+  
 }
 
 
@@ -48,18 +59,17 @@ const handleRegister = () => {
         bg={useColorModeValue('gray.50', 'gray.800')}>
         <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
           <Stack align={'center'}>
-            <Heading fontSize={'4xl'} textAlign={'center'}>
-              Sign up
-            </Heading>
-            <Text fontSize={'lg'} color={'gray.600'}>
-              to enjoy all of our cool features ✌️
-            </Text>
+          
+            
           </Stack>
           <Box
             rounded={'lg'}
             bg={useColorModeValue('white', 'gray.700')}
             boxShadow={'lg'}
             p={8}>
+               <Heading fontSize={'3xl'} textAlign={'center'} mb="3">
+              Sign up
+            </Heading>
             <Stack spacing={4}>
               <HStack>
                 <Box>
@@ -109,11 +119,12 @@ const handleRegister = () => {
                   Sign up
                 </Button>
               </Stack>
-              <Stack pt={6}>
+              <Box pt={6} display={"flex"} justifyContent={"space-between"}>
                 <Text align={'center'}>
-                  Already a user? <Link color={'blue.400'} >Login</Link>
-                </Text>
-              </Stack>
+                  Already a user?   </Text>
+                  <Text as={"u"}  cursor={"pointer"} onClick={()=> navigate("/login")} color={'blue.400'} >Login</Text>
+              
+              </Box>
             </Stack>
           </Box>
         </Stack>
